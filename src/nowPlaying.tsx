@@ -8,6 +8,7 @@ import {
   getPreferenceValues,
   launchCommand,
   open,
+  openExtensionPreferences,
 } from "@raycast/api";
 import { getProgressIcon, usePromise } from "@raycast/utils";
 import { useEffect, useRef } from "react";
@@ -29,6 +30,7 @@ interface Prefs {
 }
 
 const PIN_KEY = "pinnedSourceId";
+const TITLE_HIDDEN_KEY = "menuBarTitleHidden";
 const VOLUME_STEPS = [0, 25, 50, 75, 100];
 // Long enough to shrink the window where a native-menu rebuild can land a click on a
 // shifted row, short enough to still feel live while the menu is open.
@@ -40,7 +42,10 @@ export default function Command() {
   const orderRef = useRef<string[]>([]);
 
   const { data, isLoading, revalidate } = usePromise(async () => {
-    const pinnedId = await LocalStorage.getItem<string>(PIN_KEY);
+    const [pinnedId, titleHiddenValue] = await Promise.all([
+      LocalStorage.getItem<string>(PIN_KEY),
+      LocalStorage.getItem<string>(TITLE_HIDDEN_KEY),
+    ]);
     const [snapshot, devices, volume] = await Promise.all([
       getMediaSources(pinnedId ?? undefined),
       getDevices(),
@@ -48,7 +53,8 @@ export default function Command() {
     ]);
     const sources = stabilizeOrder(orderRef.current, snapshot.sources);
     orderRef.current = sources.map((s) => s.id);
-    return { snapshot: { ...snapshot, sources }, devices, volume, pinnedId, at: new Date() };
+    const titleHidden = titleHiddenValue === "true";
+    return { snapshot: { ...snapshot, sources }, devices, volume, pinnedId, titleHidden, at: new Date() };
   });
 
   // Live update while the menu is open; process is unloaded when it closes.
@@ -62,7 +68,7 @@ export default function Command() {
 
   const playing = data?.snapshot.sources.find((s) => s.isPlaying);
   const title =
-    prefs.menuBarStyle === "iconAndTitle" && playing
+    prefs.menuBarStyle === "iconAndTitle" && !data?.titleHidden && playing
       ? truncate(`${playing.title} – ${playing.artist ?? playing.appName}`, maxLen)
       : undefined;
 
@@ -85,12 +91,13 @@ function Menu(props: {
   devices: Awaited<ReturnType<typeof getDevices>>;
   volume: number | null;
   pinnedId: string | undefined;
+  titleHidden: boolean;
   at: Date;
   maxLen: number;
   enableAI: boolean;
   onAction: () => void;
 }) {
-  const { snapshot, devices, volume, pinnedId, at, maxLen, enableAI, onAction } = props;
+  const { snapshot, devices, volume, pinnedId, titleHidden, at, maxLen, enableAI, onAction } = props;
   const outputs = devices.filter((d) => d.kind === "output");
 
   return (
@@ -165,6 +172,20 @@ function Menu(props: {
           title="Details…"
           icon={Icon.AppWindowSidebarLeft}
           onAction={() => launchCommand({ name: "mediaDetails", type: LaunchType.UserInitiated })}
+        />
+        <MenuBarExtra.Item
+          title={titleHidden ? "Show Title in Menu Bar" : "Hide Title in Menu Bar"}
+          icon={titleHidden ? Icon.Eye : Icon.EyeDisabled}
+          onAction={async () => {
+            if (titleHidden) await LocalStorage.removeItem(TITLE_HIDDEN_KEY);
+            else await LocalStorage.setItem(TITLE_HIDDEN_KEY, "true");
+            onAction();
+          }}
+        />
+        <MenuBarExtra.Item
+          title="Open Extension Preferences"
+          icon={Icon.Gear}
+          onAction={() => openExtensionPreferences()}
         />
         <MenuBarExtra.Item title={`Updated ${at.toLocaleTimeString()}`} icon={Icon.Clock} onAction={onAction} />
       </MenuBarExtra.Section>

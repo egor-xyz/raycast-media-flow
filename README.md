@@ -73,7 +73,10 @@ The menu bar icon shows the current track's artwork (falling back to a music-not
 icon when nothing is playing or no artwork is available). With the default "Icon
 and Title" style, the title text next to it shows `Title – Artist`, truncated to
 `maxTitleLength` characters (30 by default); switch to "Icon Only" to hide the
-title.
+title. The footer's "Hide/Show Title in Menu Bar" item lets you toggle the title
+on and off for the current session without leaving the menu, but the permanent
+setting is the Menu Bar Style preference, one click away via the "Open Extension
+Preferences" item just below it.
 
 Click the icon to open the menu:
 

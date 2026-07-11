@@ -74,7 +74,7 @@ Menu structure (native NSMenu):
   Output ▸ (Submenu): ✓ AirPods Pro ⌁ · MacBook Speakers · … (onAction: switch)
   Volume ▸ (Submenu): ◔ 75% · Mute · 25% · 50% · 75% · 100% · Louder ⌘↑ · Quieter ⌘↓
 [Section]
-  Details… (opens view command) · Refresh · Preferences… · Last update 12:03:44
+  Details… (opens view command) · Hide/Show Title in Menu Bar · Open Extension Preferences · Refresh · Last update 12:03:44
 ```
 * Progress rendered as `getProgressIcon(position/duration)` in the source item's icon slot or a dedicated item; text `1:23 / 3:45` in subtitle.
 * While menu open: 10s `setInterval` re-poll updates position/state live (kept long enough to
@@ -127,7 +127,9 @@ navigation required.
 playing-first sort in `getMediaSources()`, so a manual "preferred engine" toggle was
 intentionally dropped.)
 
-Runtime-mutable state in `LocalStorage`: pinned source id, last known artwork cache index.
+Runtime-mutable state in `LocalStorage`: pinned source id, last known artwork cache index,
+menu bar title hidden override (session-level toggle layered on top of the read-only
+`menuBarStyle` preference; clearing it falls back to the preference).
 
 ---
 
