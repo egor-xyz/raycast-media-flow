@@ -5,3 +5,5 @@ dist/
 
 # Internal planning artifacts (spec/plan) — kept locally, not shipped.
 docs/superpowers/
+.superpowers/
+raycast-env.d.ts
