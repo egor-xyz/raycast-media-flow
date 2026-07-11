@@ -4,7 +4,7 @@
   "title": "MediaFlow",
   "description": "Universal now-playing monitor and audio device switcher for macOS.",
   "icon": "icon.png",
-  "author": "egor-xyz",
+  "author": "egorxyz",
   "license": "MIT",
   "packageManager": "pnpm@11.7.0",
   "commands": [
