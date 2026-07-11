@@ -26,6 +26,15 @@ describe("getDevices", () => {
     // device 2 is both input and output → two entries
     expect(devices.filter((d) => d.id === "2")).toHaveLength(2);
   });
+  it("recognizes bluetoothle transport as wireless", async () => {
+    lib.getAllDevices.mockResolvedValue([
+      { id: 3, name: "AirPods Max", isInput: false, isOutput: true, transportType: "bluetoothle" },
+    ]);
+    lib.getDefaultOutputDevice.mockResolvedValue({ id: 3 });
+    lib.getDefaultInputDevice.mockResolvedValue({ id: 3 });
+    const devices = await getDevices();
+    expect(devices.find((d) => d.id === "3")).toMatchObject({ isWireless: true });
+  });
   it("empty array on library failure", async () => {
     lib.getAllDevices.mockRejectedValue(new Error("boom"));
     expect(await getDevices()).toEqual([]);

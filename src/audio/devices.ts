@@ -1,7 +1,7 @@
 import type { AudioDevice } from "../core/types";
 
 /** transportType values (lowercased) that count as wireless. */
-const WIRELESS_TRANSPORTS = new Set(["bluetooth", "bluetooth-le", "airplay"]);
+const WIRELESS_TRANSPORTS = new Set(["bluetooth", "bluetooth-le", "bluetoothle", "airplay"]);
 
 interface RawDevice {
   id: number;
