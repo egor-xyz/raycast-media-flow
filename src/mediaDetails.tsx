@@ -5,6 +5,7 @@ import { controlSource, getMediaSources } from "./core/mediaService";
 import { registerAllProviders } from "./core/setup";
 import type { MediaSource } from "./core/types";
 import { formatTime } from "./lib/format";
+import { refreshMenuBar } from "./lib/refreshMenuBar";
 
 registerAllProviders();
 
@@ -70,6 +71,7 @@ export default function Command(props: LaunchProps<{ launchContext?: { findSimil
                 onAction={async () => {
                   await controlSource(s, "playpause");
                   revalidate();
+                  await refreshMenuBar();
                 }}
               />
               <Action
@@ -79,6 +81,7 @@ export default function Command(props: LaunchProps<{ launchContext?: { findSimil
                 onAction={async () => {
                   await controlSource(s, "next");
                   revalidate();
+                  await refreshMenuBar();
                 }}
               />
               <Action
@@ -88,6 +91,7 @@ export default function Command(props: LaunchProps<{ launchContext?: { findSimil
                 onAction={async () => {
                   await controlSource(s, "previous");
                   revalidate();
+                  await refreshMenuBar();
                 }}
               />
               {enableAI && (
