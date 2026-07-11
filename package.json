@@ -1,0 +1,96 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "media-flow",
+  "title": "MediaFlow",
+  "description": "Universal now-playing monitor and audio device switcher for macOS.",
+  "icon": "icon.png",
+  "author": "egor-xyz",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "nowPlaying",
+      "title": "Now Playing",
+      "description": "Current media in the menu bar",
+      "mode": "menu-bar",
+      "interval": "1m"
+    },
+    {
+      "name": "mediaDetails",
+      "title": "Media Details",
+      "description": "Rich view of all active media sources",
+      "mode": "view"
+    },
+    {
+      "name": "searchDevices",
+      "title": "Audio Devices",
+      "description": "List and switch audio input/output devices",
+      "mode": "view"
+    }
+  ],
+  "tools": [
+    { "name": "get-now-playing", "title": "Get Now Playing", "description": "Returns the currently playing tracks as JSON" },
+    { "name": "control-playback", "title": "Control Playback", "description": "Play, pause or skip the current track" },
+    { "name": "find-similar", "title": "Find Similar Music", "description": "Suggest tracks similar to the current one" }
+  ],
+  "preferences": [
+    {
+      "name": "menuBarStyle",
+      "title": "Menu Bar Style",
+      "description": "Show icon with track title, or icon only",
+      "type": "dropdown",
+      "required": false,
+      "default": "iconAndTitle",
+      "data": [
+        { "title": "Icon and Title", "value": "iconAndTitle" },
+        { "title": "Icon Only", "value": "iconOnly" }
+      ]
+    },
+    {
+      "name": "showWhenStopped",
+      "title": "Visibility",
+      "label": "Show menu bar icon when nothing is playing",
+      "description": "Keep the icon visible while no media plays",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "maxTitleLength",
+      "title": "Max Title Length",
+      "description": "Truncate the menu bar title after this many characters",
+      "type": "textfield",
+      "required": false,
+      "default": "30"
+    },
+    {
+      "name": "enableAI",
+      "title": "AI",
+      "label": "Enable AI features (Find Similar)",
+      "description": "Toggle AI-powered actions",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.104.0",
+    "@raycast/utils": "^2.2.0",
+    "macos-audio-devices": "^1.4.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
