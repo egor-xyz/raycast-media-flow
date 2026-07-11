@@ -58,9 +58,9 @@ writeup.
 
 | App | Detection | Control | Artwork |
 | --- | --- | --- | --- |
-| Music.app | `media-control` + AppleScript | Yes (AppleScript) | Yes |
-| Spotify | `media-control` + AppleScript | Yes (AppleScript) | Yes |
-| VLC | `media-control` for metadata; AppleScript is transport-control-only (no reliable metadata dictionary) | Yes (AppleScript transport) | Via `media-control` |
+| Music.app | `media-control` + AppleScript | Yes (AppleScript) | Via `media-control` |
+| Spotify | `media-control` + AppleScript | Yes (AppleScript) | Via `media-control` |
+| VLC | `media-control` only — AppleScript offers transport-only control, but no VLC provider is implemented | Via `media-control` | Via `media-control` |
 | TIDAL | `media-control` only — no AppleScript dictionary | Via `media-control` | Via `media-control` |
 | Deezer | `media-control` only — no AppleScript dictionary | Via `media-control` | Via `media-control` |
 | Amazon Music | `media-control` only — no AppleScript dictionary | Via `media-control` | Via `media-control` |

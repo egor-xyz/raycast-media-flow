@@ -88,9 +88,9 @@ Run `pnpm test` (or scope it with `pnpm test -- your-provider`) before opening a
 
 | App | AppleScript dictionary | Coverage today |
 | --- | --- | --- |
-| Music.app | Full (`player state`, `current track`, raw `artwork 1` bytes) + control | `media-control` + AppleScript enrichment/control |
-| Spotify | Full (`player state`, `current track`, `artwork url`, `spotify url`) + control | `media-control` + AppleScript enrichment/control |
-| VLC | Transport control only — no reliable metadata via AppleScript | `media-control` for metadata, could add VLC as a control-only provider |
+| Music.app | Full metadata (`player state`, `current track`) + control; artwork via `media-control` (AppleScript raw `artwork 1` is possible but not implemented) | `media-control` + AppleScript enrichment/control |
+| Spotify | Full metadata (`player state`, `current track`, `spotify url`) + control; artwork via `media-control` (the dictionary exposes `artwork url`, but the provider does not fetch it) | `media-control` + AppleScript enrichment/control |
+| VLC | Transport control only — no reliable metadata via AppleScript | `media-control` only today; a control-only VLC provider is possible but not implemented |
 | Safari / Chrome | No media dictionary — tab title + URL only (YouTube-title heuristic) | Browser tab-title fallback provider (`src/providers/browser.ts`), no position/artwork |
 | TIDAL, Deezer, Amazon Music, Firefox | No AppleScript dictionary at all | `media-control`-only — no provider needed or possible today |
 
