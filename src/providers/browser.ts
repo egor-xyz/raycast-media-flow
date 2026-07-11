@@ -6,18 +6,41 @@ const SAFARI_SCRIPT =
 const CHROME_SCRIPT =
   'tell application "Google Chrome" to return (title of active tab of front window) & "|" & (URL of active tab of front window)';
 
-/** Domains whose tabs are treated as playable media sources. */
-const PLAYER_DOMAINS = ["youtube.com/watch", "music.youtube.com", "open.spotify.com", "soundcloud.com"] as const;
-
 const YOUTUBE_SUFFIX = " - YouTube";
 const NOTIFICATION_PREFIX = /^\(\d+\)\s*/;
 
+function parseUrl(url: string): URL | null {
+  try {
+    return new URL(url);
+  } catch {
+    return null;
+  }
+}
+
+function isYouTubeHost(hostname: string): boolean {
+  return hostname === "youtube.com" || hostname.endsWith(".youtube.com");
+}
+
+/**
+ * Player-domain allowlist, matched against the parsed hostname/pathname — substring
+ * checks on the raw URL are spoofable (e.g. https://evil.com/youtube.com/watch).
+ * Allowed: youtube.com/watch (any youtube.com host), music.youtube.com,
+ * open.spotify.com, soundcloud.com.
+ */
 function matchesPlayerDomain(url: string): boolean {
-  return PLAYER_DOMAINS.some((domain) => url.includes(domain));
+  const u = parseUrl(url);
+  if (!u) return false;
+  const { hostname, pathname } = u;
+  if (hostname === "music.youtube.com") return true;
+  if (isYouTubeHost(hostname) && pathname.startsWith("/watch")) return true;
+  if (hostname === "open.spotify.com") return true;
+  if (hostname === "soundcloud.com" || hostname.endsWith(".soundcloud.com")) return true;
+  return false;
 }
 
 function isYouTubeDomain(url: string): boolean {
-  return url.includes("youtube.com");
+  const u = parseUrl(url);
+  return u !== null && isYouTubeHost(u.hostname);
 }
 
 /**
@@ -84,8 +107,8 @@ function makeBrowserProvider(cfg: BrowserProviderConfig): SourceProvider {
         title = parsed.title;
         artist = parsed.artist;
       } else {
-        if (!rawTitle.trim()) return null;
-        title = rawTitle;
+        title = rawTitle.trim();
+        if (!title) return null;
       }
 
       return {

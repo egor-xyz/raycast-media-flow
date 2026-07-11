@@ -62,6 +62,40 @@ describe("edge cases", () => {
     expect(s).toMatchObject({ title: "A Mix", url: "https://soundcloud.com/artist/a-mix" });
   });
 
+  it("parses title/artist for a music.youtube.com tab end-to-end", async () => {
+    vi.mocked(runAppleScript).mockResolvedValue(
+      "Daft Punk - Around the World - YouTube|https://music.youtube.com/watch?v=y",
+    );
+    const s = await chromeProvider.getSource();
+    expect(s).toMatchObject({
+      appName: "Chrome",
+      artist: "Daft Punk",
+      title: "Around the World",
+      url: "https://music.youtube.com/watch?v=y",
+    });
+  });
+
+  it("null for hostname-spoofing URL with youtube.com in the path", async () => {
+    vi.mocked(runAppleScript).mockResolvedValue("Watch - YouTube|https://evil.com/youtube.com/watch");
+    expect(await safariProvider.getSource()).toBeNull();
+  });
+
+  it("null for URL with allowlisted domain only in the query string", async () => {
+    vi.mocked(runAppleScript).mockResolvedValue("foo|https://github.com/foo?ref=open.spotify.com");
+    expect(await safariProvider.getSource()).toBeNull();
+  });
+
+  it("null for an unparseable URL", async () => {
+    vi.mocked(runAppleScript).mockResolvedValue("Song - YouTube|not a url");
+    expect(await safariProvider.getSource()).toBeNull();
+  });
+
+  it("trims raw title on non-youtube domains", async () => {
+    vi.mocked(runAppleScript).mockResolvedValue("  Some Track  |https://open.spotify.com/track/abc");
+    const s = await safariProvider.getSource();
+    expect(s?.title).toBe("Some Track");
+  });
+
   it("null when non-youtube tab has empty title", async () => {
     vi.mocked(runAppleScript).mockResolvedValue("|https://open.spotify.com/track/abc");
     expect(await safariProvider.getSource()).toBeNull();
