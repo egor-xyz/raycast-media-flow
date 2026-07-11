@@ -20,4 +20,13 @@ describe("volume", () => {
     expect(await setSystemVolume(150)).toBe(true);
     expect(runAppleScript).toHaveBeenCalledWith("set volume output volume 100");
   });
+  it("rejects NaN without spawning osascript", async () => {
+    expect(await setSystemVolume(NaN)).toBe(false);
+    expect(runAppleScript).not.toHaveBeenCalled();
+  });
+  it("clamps negative volume to 0", async () => {
+    vi.mocked(runAppleScript).mockResolvedValue("");
+    expect(await setSystemVolume(-5)).toBe(true);
+    expect(runAppleScript).toHaveBeenCalledWith("set volume output volume 0");
+  });
 });

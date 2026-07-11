@@ -8,8 +8,9 @@ export async function getSystemVolume(): Promise<number | null> {
   return Number.isFinite(n) ? n : null;
 }
 
-/** Set system output volume, clamped to 0–100. Returns false on failure. */
+/** Set system output volume, clamped to 0–100. Rejects non-finite input. Returns false on failure. */
 export async function setSystemVolume(v: number): Promise<boolean> {
+  if (!Number.isFinite(v)) return false;
   const clamped = Math.min(100, Math.max(0, Math.round(v)));
   const out = await runAppleScript(`set volume output volume ${clamped}`);
   return out !== null;
