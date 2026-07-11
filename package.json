@@ -28,7 +28,7 @@
     }
   ],
   "tools": [
-    { "name": "get-now-playing", "title": "Get Now Playing", "description": "Returns the currently playing tracks as JSON" },
+    { "name": "get-now-playing", "title": "Get Now Playing", "description": "Returns the currently playing tracks" },
     { "name": "control-playback", "title": "Control Playback", "description": "Play, pause or skip the current track" },
     { "name": "find-similar", "title": "Find Similar Music", "description": "Suggest tracks similar to the current one" }
   ],
