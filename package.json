@@ -26,6 +26,24 @@
       "title": "Audio Devices",
       "description": "List and switch audio input/output devices",
       "mode": "view"
+    },
+    {
+      "name": "nextTrack",
+      "title": "Next Track",
+      "description": "Skip to the next track on the active media source",
+      "mode": "no-view"
+    },
+    {
+      "name": "previousTrack",
+      "title": "Previous Track",
+      "description": "Go back to the previous track on the active media source",
+      "mode": "no-view"
+    },
+    {
+      "name": "togglePlayPause",
+      "title": "Play/Pause",
+      "description": "Toggle play/pause on the active media source",
+      "mode": "no-view"
     }
   ],
   "tools": [
