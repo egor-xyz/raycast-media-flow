@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { cacheArtwork } from "../core/artworkCache";
 import type { MediaSource, PlaybackCommand, SourceProvider } from "../core/types";
 import { execSafe } from "../lib/exec";
@@ -14,7 +15,18 @@ export interface RawNowPlaying {
   artworkMimeType?: string;
 }
 
-const BIN = "media-control";
+/** Store-installed Raycast runs with a minimal PATH that omits Homebrew's bin dirs, so
+ * resolve an absolute path once at module load instead of relying on shell PATH lookup. */
+function resolveMediaControlBin(): string {
+  const candidates = ["/opt/homebrew/bin/media-control", "/usr/local/bin/media-control"];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return "media-control";
+}
+
+export const MEDIA_CONTROL_BIN = resolveMediaControlBin();
+const BIN = MEDIA_CONTROL_BIN;
 
 export function parseMediaControlOutput(json: string): RawNowPlaying | null {
   try {

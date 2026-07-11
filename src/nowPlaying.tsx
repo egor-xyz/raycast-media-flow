@@ -4,15 +4,16 @@ import {
   LaunchType,
   LocalStorage,
   MenuBarExtra,
+  environment,
   getPreferenceValues,
   launchCommand,
   open,
 } from "@raycast/api";
 import { getProgressIcon, usePromise } from "@raycast/utils";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getDevices, setDefaultOutput } from "./audio/devices";
 import { getSystemVolume, setSystemVolume } from "./audio/volume";
-import { controlSource, getMediaSources, type MediaSnapshot } from "./core/mediaService";
+import { controlSource, getMediaSources, stabilizeOrder, type MediaSnapshot } from "./core/mediaService";
 import { registerAllProviders } from "./core/setup";
 import type { MediaSource } from "./core/types";
 import { execSafe } from "./lib/exec";
@@ -29,10 +30,14 @@ interface Prefs {
 
 const PIN_KEY = "pinnedSourceId";
 const VOLUME_STEPS = [0, 25, 50, 75, 100];
+// Long enough to shrink the window where a native-menu rebuild can land a click on a
+// shifted row, short enough to still feel live while the menu is open.
+const OPEN_MENU_POLL_MS = 10000;
 
 export default function Command() {
   const prefs = getPreferenceValues<Prefs>();
   const maxLen = Number(prefs.maxTitleLength) || 30;
+  const orderRef = useRef<string[]>([]);
 
   const { data, isLoading, revalidate } = usePromise(async () => {
     const pinnedId = await LocalStorage.getItem<string>(PIN_KEY);
@@ -41,12 +46,17 @@ export default function Command() {
       getDevices(),
       getSystemVolume(),
     ]);
-    return { snapshot, devices, volume, pinnedId, at: new Date() };
+    const sources = stabilizeOrder(orderRef.current, snapshot.sources);
+    orderRef.current = sources.map((s) => s.id);
+    return { snapshot: { ...snapshot, sources }, devices, volume, pinnedId, at: new Date() };
   });
 
   // Live update while the menu is open; process is unloaded when it closes.
+  // Background-refresh launches must not keep the process alive with a timer, or the
+  // refresh cycle can wedge and the menu-bar title goes stale.
   useEffect(() => {
-    const t = setInterval(() => revalidate(), 2000);
+    if (environment.launchType === LaunchType.Background) return;
+    const t = setInterval(() => revalidate(), OPEN_MENU_POLL_MS);
     return () => clearInterval(t);
   }, [revalidate]);
 

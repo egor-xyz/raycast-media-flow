@@ -59,6 +59,28 @@ export async function getMediaSources(pinnedId?: string): Promise<MediaSnapshot>
   return { sources, engineAvailable };
 }
 
+/**
+ * Reorders `sources` to match the relative order of ids in `prev`, appending any ids not
+ * seen in `prev` at the end (in their given order). Used to keep menu rows from shifting
+ * position on every live re-poll while a native menu is open — only the id *set* changing
+ * (a source appearing/disappearing) should reshuffle rows; state flips like isPlaying should not.
+ */
+export function stabilizeOrder(prev: string[], sources: MediaSource[]): MediaSource[] {
+  const byId = new Map(sources.map((s) => [s.id, s]));
+  const ordered: MediaSource[] = [];
+  for (const id of prev) {
+    const s = byId.get(id);
+    if (s) {
+      ordered.push(s);
+      byId.delete(id);
+    }
+  }
+  for (const s of sources) {
+    if (byId.has(s.id)) ordered.push(s);
+  }
+  return ordered;
+}
+
 export async function controlSource(source: MediaSource, cmd: PlaybackCommand): Promise<void> {
   const owner = source.bundleId ? findProviderForBundle(source.bundleId) : undefined;
   if (owner?.capabilities.control && owner.control) {

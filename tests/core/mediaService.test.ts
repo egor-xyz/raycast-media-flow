@@ -14,7 +14,7 @@ vi.mock("../../src/providers/mediaControl", () => ({
 }));
 import { mediaControlProvider } from "../../src/providers/mediaControl";
 import { clearProviders, registerProvider } from "../../src/core/registry";
-import { controlSource, getMediaSources } from "../../src/core/mediaService";
+import { controlSource, getMediaSources, stabilizeOrder } from "../../src/core/mediaService";
 
 const mc = mediaControlProvider as unknown as {
   isAvailable: ReturnType<typeof vi.fn>;
@@ -112,6 +112,31 @@ describe("getMediaSources", () => {
     const { sources, engineAvailable } = await getMediaSources();
     expect(engineAvailable).toBe(false);
     expect(sources).toHaveLength(1);
+  });
+});
+
+describe("stabilizeOrder", () => {
+  it("preserves the previous relative order for known ids", () => {
+    const sources = [src({ id: "b" }), src({ id: "a" }), src({ id: "c" })];
+    const result = stabilizeOrder(["a", "b", "c"], sources);
+    expect(result.map((s) => s.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("appends new ids in their given order after known ones", () => {
+    const sources = [src({ id: "b" }), src({ id: "new2" }), src({ id: "a" }), src({ id: "new1" })];
+    const result = stabilizeOrder(["a", "b"], sources);
+    expect(result.map((s) => s.id)).toEqual(["a", "b", "new2", "new1"]);
+  });
+
+  it("drops ids from prev that are no longer present", () => {
+    const sources = [src({ id: "a" })];
+    const result = stabilizeOrder(["z", "a", "y"], sources);
+    expect(result.map((s) => s.id)).toEqual(["a"]);
+  });
+
+  it("returns sources as-is order when prev is empty", () => {
+    const sources = [src({ id: "a" }), src({ id: "b" })];
+    expect(stabilizeOrder([], sources).map((s) => s.id)).toEqual(["a", "b"]);
   });
 });
 

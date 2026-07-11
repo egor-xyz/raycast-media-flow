@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../../src/lib/exec", () => ({ execSafe: vi.fn() }));
 vi.mock("../../src/core/artworkCache", () => ({ cacheArtwork: vi.fn(async () => "/tmp/a.jpg") }));
 import { execSafe } from "../../src/lib/exec";
-import { mediaControlProvider, parseMediaControlOutput } from "../../src/providers/mediaControl";
+import { MEDIA_CONTROL_BIN, mediaControlProvider, parseMediaControlOutput } from "../../src/providers/mediaControl";
 
 beforeEach(() => vi.mocked(execSafe).mockReset());
 
@@ -48,7 +48,7 @@ describe("mediaControlProvider.getSource", () => {
       origin: "media-remote",
       artworkPath: "/tmp/a.jpg",
     });
-    expect(execSafe).toHaveBeenCalledWith("media-control", ["get"], expect.anything());
+    expect(execSafe).toHaveBeenCalledWith(MEDIA_CONTROL_BIN, ["get"], expect.anything());
   });
   it("returns null when CLI missing", async () => {
     vi.mocked(execSafe).mockResolvedValue(null);
@@ -60,9 +60,9 @@ describe("mediaControlProvider.control", () => {
   it("maps commands to subcommands", async () => {
     vi.mocked(execSafe).mockResolvedValue("");
     await mediaControlProvider.control!("playpause");
-    expect(execSafe).toHaveBeenCalledWith("media-control", ["toggle-play-pause"], expect.anything());
+    expect(execSafe).toHaveBeenCalledWith(MEDIA_CONTROL_BIN, ["toggle-play-pause"], expect.anything());
     await mediaControlProvider.control!("next");
-    expect(execSafe).toHaveBeenCalledWith("media-control", ["next-track"], expect.anything());
+    expect(execSafe).toHaveBeenCalledWith(MEDIA_CONTROL_BIN, ["next-track"], expect.anything());
   });
 });
 

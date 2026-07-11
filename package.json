@@ -13,7 +13,7 @@
       "title": "Now Playing",
       "description": "Current media in the menu bar",
       "mode": "menu-bar",
-      "interval": "1m"
+      "interval": "10s"
     },
     {
       "name": "mediaDetails",
