@@ -43,11 +43,11 @@ Raycast Store listing: TBD.
 For local development:
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
-`pnpm dev` runs `ray develop` and hot-reloads the extension in Raycast.
+`npm run dev` runs `ray develop` and hot-reloads the extension in Raycast.
 
 ### Optional dependency: `media-control`
 

@@ -6,7 +6,6 @@
   "icon": "icon.png",
   "author": "egorxyz",
   "license": "MIT",
-  "packageManager": "pnpm@11.7.0",
   "commands": [
     {
       "name": "nowPlaying",

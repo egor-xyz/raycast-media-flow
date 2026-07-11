@@ -3,7 +3,7 @@
 **Project Name:** MediaFlow
 **Description:** A universal, open-source now-playing monitor and audio device switcher for macOS, living in the Raycast menu bar.
 **Repo:** https://github.com/egor-xyz/raycast-media-flow
-**Package manager:** pnpm
+**Package manager:** npm
 
 > v1 of this spec targeted a fictional "Raycast v2 API" and several macOS APIs that no longer
 > work (MediaRemote direct linking, MPMediaQuery) or never existed (Slider, Form-Drafts-as-
