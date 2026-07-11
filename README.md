@@ -25,7 +25,7 @@ living in the Raycast menu bar.
 
 | Command | Mode | Description |
 | --- | --- | --- |
-| Now Playing | Menu bar (10s background refresh) | Current media in the menu bar |
+| Now Playing | Menu bar (background refresh, ~1 min effective) | Current media in the menu bar |
 | Media Details | View | Rich view of all active media sources |
 | Audio Devices | View | List and switch audio input/output devices |
 | Next Track | No-view | Skip to the next track on the active media source |
@@ -103,12 +103,13 @@ menu reflect the change immediately instead of waiting out the next poll.
 ### Refresh behavior
 
 While the menu bar item is idle (menu closed), it follows changes made outside
-Raycast — switching tracks in Spotify, for example — via a background refresh
-that polls roughly every 10 seconds. Raycast schedules background refreshes
-itself and may stretch that interval under system/battery optimization, so an
-update can occasionally lag past 10s. While the menu is open, a separate 10s
-timer re-polls and live-updates position/progress; it stops the moment the menu
-closes.
+Raycast — switching tracks in Spotify, for example — via Raycast's background
+refresh. In practice Raycast schedules these runs about **once per minute**
+(measured), regardless of the manifest's shorter interval, so an app-side track
+change can take up to ~1 minute to appear. Controls that go through MediaFlow
+(menu items, the Next/Previous/Play-Pause commands) refresh the menu bar
+immediately. While the menu is open, a 10s timer re-polls and live-updates
+position/progress; it stops the moment the menu closes.
 
 ### AI
 
