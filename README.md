@@ -21,6 +21,17 @@ living in the Raycast menu bar.
 - **AI tools** — `Get Now Playing`, `Control Playback`, and `Find Similar Music`,
   usable from Raycast AI / Quick AI once the extension is installed.
 
+## Commands
+
+| Command | Mode | Description |
+| --- | --- | --- |
+| Now Playing | Menu bar (10s background refresh) | Current media in the menu bar |
+| Media Details | View | Rich view of all active media sources |
+| Audio Devices | View | List and switch audio input/output devices |
+| Next Track | No-view | Skip to the next track on the active media source |
+| Previous Track | No-view | Go back to the previous track on the active media source |
+| Play/Pause | No-view | Toggle play/pause on the active media source |
+
 ## Install
 
 Raycast Store listing: TBD.
@@ -53,6 +64,73 @@ tab-title fallback) and shows an install hint in the menu. Direct use of Apple's
 `media-control` — not a bundled/private API call — is the supported path. See
 [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full detection-engine
 writeup.
+
+## Usage
+
+### Menu bar
+
+The menu bar icon shows the current track's artwork (falling back to a music-note
+icon when nothing is playing or no artwork is available). With the default "Icon
+and Title" style, the title text next to it shows `Title – Artist`, truncated to
+`maxTitleLength` characters (30 by default); switch to "Icon Only" to hide the
+title.
+
+Click the icon to open the menu:
+
+- **Now Playing** — one item per active source (playing sources and the pinned
+  source listed first). Clicking a track opens its app.
+  - Play/Pause
+  - Next Track — hold ⌥ (Option) to reveal Previous Track in its place
+  - A "More" submenu with Copy "Title — Artist", Copy URL (when the source has
+    one), Pin/Unpin, and Find Similar (AI) when AI is enabled
+- **Audio**
+  - An Output submenu to switch the default output device
+  - A Volume submenu with Mute, 25/50/75/100% presets, and Louder (⌘↑) /
+    Quieter (⌘↓) items that step the system volume by 10%
+- **Details…** — opens Media Details, plus an "Updated <time>" item that
+  doubles as a manual refresh
+
+### Instant control
+
+Next Track, Previous Track, and Play/Pause are `no-view` commands, so each can
+be run straight from Raycast's root search — type the command name and hit
+Enter — without opening the menu bar dropdown. Since these are meant for
+repeated use, assign each one a hotkey: **Raycast → Extensions → MediaFlow →**
+(select the command) **→ Hotkey**. Each command shows a HUD confirming the
+action and then best-effort refreshes the Now Playing menu bar, so its icon and
+menu reflect the change immediately instead of waiting out the next poll.
+
+### Refresh behavior
+
+While the menu bar item is idle (menu closed), it follows changes made outside
+Raycast — switching tracks in Spotify, for example — via a background refresh
+that polls roughly every 10 seconds. Raycast schedules background refreshes
+itself and may stretch that interval under system/battery optimization, so an
+update can occasionally lag past 10s. While the menu is open, a separate 10s
+timer re-polls and live-updates position/progress; it stops the moment the menu
+closes.
+
+### AI
+
+With the `enableAI` preference on (default), ask "What's playing?" in Raycast
+AI chat / Quick AI to read the current track(s) via the `Get Now Playing` tool,
+or ask it to play, pause, or skip via the `Control Playback` tool. "Find
+Similar (AI)" in the menu's More submenu asks Raycast AI for five similar
+tracks — this needs Raycast AI access (Raycast Pro or the AI add-on); without
+it, the tool reports that Raycast AI isn't available instead of suggestions.
+
+### Preferences
+
+Set these under **Raycast → Extensions → MediaFlow → Preferences**:
+
+- **Menu Bar Style** (`menuBarStyle`) — show icon with track title, or icon
+  only (default: Icon and Title)
+- **Visibility** (`showWhenStopped`) — keep the menu bar icon visible when
+  nothing is playing (default: on)
+- **Max Title Length** (`maxTitleLength`) — truncate the menu bar title after
+  this many characters (default: 30)
+- **AI** (`enableAI`) — enable AI-powered actions like Find Similar (default:
+  on)
 
 ## Supported apps
 
