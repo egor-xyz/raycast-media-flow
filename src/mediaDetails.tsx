@@ -1,6 +1,6 @@
-import { Action, ActionPanel, Detail, getPreferenceValues, Icon, LaunchProps, List, useNavigation } from "@raycast/api";
-import { useAI, usePromise } from "@raycast/utils";
-import { useEffect, useState } from "react";
+import { Action, ActionPanel, Icon, List } from "@raycast/api";
+import { usePromise } from "@raycast/utils";
+import { useEffect } from "react";
 import { controlSource, getMediaSources } from "./core/mediaService";
 import { registerAllProviders } from "./core/setup";
 import type { MediaSource } from "./core/types";
@@ -9,36 +9,13 @@ import { refreshMenuBar } from "./lib/refreshMenuBar";
 
 registerAllProviders();
 
-interface Prefs {
-  enableAI: boolean;
-}
-
-export default function Command(props: LaunchProps<{ launchContext?: { findSimilarFor?: string } }>) {
-  const { enableAI } = getPreferenceValues<Prefs>();
+export default function Command() {
   const { data, isLoading, revalidate } = usePromise(() => getMediaSources());
 
   useEffect(() => {
     const t = setInterval(() => revalidate(), 2000);
     return () => clearInterval(t);
   }, [revalidate]);
-
-  const { push } = useNavigation();
-  const findSimilarFor = props.launchContext?.findSimilarFor;
-  const [autoPushed, setAutoPushed] = useState(false);
-
-  // Deep-link from nowPlaying's "Find Similar (AI)" menu item: once the sources have
-  // loaded, push the AI panel for the requested source exactly once. Gated on the
-  // enableAI preference — nowPlaying only offers this deep link when AI is enabled,
-  // but a stale launch context (or a manual launchCommand call) could still arrive
-  // after the user turns AI off, so re-check here.
-  useEffect(() => {
-    if (autoPushed || !findSimilarFor || !data || !enableAI) return;
-    const source = data.sources.find((s) => s.id === findSimilarFor);
-    if (source) {
-      setAutoPushed(true);
-      push(<Similar source={source} />);
-    }
-  }, [autoPushed, findSimilarFor, data, enableAI, push]);
 
   return (
     <List isLoading={isLoading} isShowingDetail>
@@ -94,14 +71,6 @@ export default function Command(props: LaunchProps<{ launchContext?: { findSimil
                   await refreshMenuBar();
                 }}
               />
-              {enableAI && (
-                <Action
-                  title="Find Similar (AI)"
-                  icon={Icon.Stars}
-                  shortcut={{ modifiers: ["cmd"], key: "f" }}
-                  onAction={() => push(<Similar source={s} />)}
-                />
-              )}
               {s.url && <Action.OpenInBrowser url={s.url} />}
               <Action.CopyToClipboard title="Copy Title — Artist" content={`${s.title} — ${s.artist ?? ""}`} />
             </ActionPanel>
@@ -132,17 +101,4 @@ function ItemDetail(props: { source: MediaSource }) {
       }
     />
   );
-}
-
-/**
- * Pushed as a full navigation screen rather than swapped into the selected item's
- * detail pane (see brief's implementer note): keeps the `useAI` call scoped to a
- * single mounted component instead of juggling per-row detail state.
- */
-function Similar(props: { source: MediaSource }) {
-  const { data, isLoading } = useAI(
-    `Suggest 5 songs similar to "${props.source.title}" by ${props.source.artist ?? "unknown"}. Reply as a markdown list: **Title** — Artist (one line why).`,
-    { creativity: 1.5 },
-  );
-  return <Detail isLoading={isLoading} markdown={`## Similar to ${props.source.title}\n\n${data ?? "Thinking…"}`} />;
 }

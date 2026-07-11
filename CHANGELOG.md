@@ -12,5 +12,4 @@
   and control for Music.app and Spotify, and graceful degradation to AppleScript-only
   coverage when `media-control` isn't installed.
 - Pin any source to the top of the menu, with playing-first sorting.
-- AI tools: Get Now Playing, Control Playback, and Find Similar Music, usable from
-  Raycast AI / Quick AI.
+- AI tools: Get Now Playing and Control Playback, usable from Raycast AI / Quick AI.

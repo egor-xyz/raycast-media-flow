@@ -26,7 +26,6 @@ interface Prefs {
   menuBarStyle: "iconAndTitle" | "iconOnly";
   showWhenStopped: boolean;
   maxTitleLength: string;
-  enableAI: boolean;
 }
 
 const PIN_KEY = "pinnedSourceId";
@@ -81,7 +80,7 @@ export default function Command() {
       title={title}
       tooltip={playing ? `${playing.title} — ${playing.artist ?? ""} — ${playing.appName}` : "MediaFlow"}
     >
-      {data && <Menu {...data} maxLen={maxLen} enableAI={prefs.enableAI} onAction={revalidate} />}
+      {data && <Menu {...data} maxLen={maxLen} onAction={revalidate} />}
     </MenuBarExtra>
   );
 }
@@ -94,10 +93,9 @@ function Menu(props: {
   titleHidden: boolean;
   at: Date;
   maxLen: number;
-  enableAI: boolean;
   onAction: () => void;
 }) {
-  const { snapshot, devices, volume, pinnedId, titleHidden, at, maxLen, enableAI, onAction } = props;
+  const { snapshot, devices, volume, pinnedId, titleHidden, at, maxLen, onAction } = props;
   const outputs = devices.filter((d) => d.kind === "output");
 
   return (
@@ -115,7 +113,7 @@ function Menu(props: {
           </>
         )}
         {snapshot.sources.map((s) => (
-          <SourceItems key={s.id} source={s} pinned={pinnedId === s.id} maxLen={maxLen} enableAI={enableAI} onAction={onAction} />
+          <SourceItems key={s.id} source={s} pinned={pinnedId === s.id} maxLen={maxLen} onAction={onAction} />
         ))}
       </MenuBarExtra.Section>
 
@@ -204,8 +202,8 @@ function openSource(s: MediaSource): void {
   }
 }
 
-function SourceItems(props: { source: MediaSource; pinned: boolean; maxLen: number; enableAI: boolean; onAction: () => void }) {
-  const { source: s, pinned, maxLen, enableAI, onAction } = props;
+function SourceItems(props: { source: MediaSource; pinned: boolean; maxLen: number; onAction: () => void }) {
+  const { source: s, pinned, maxLen, onAction } = props;
   const progress = s.duration && s.position !== undefined ? Math.min(1, s.position / s.duration) : undefined;
   const timing = s.duration ? `${formatTime(s.position)} / ${formatTime(s.duration)}` : undefined;
 
@@ -271,15 +269,6 @@ function SourceItems(props: { source: MediaSource; pinned: boolean; maxLen: numb
             onAction();
           }}
         />
-        {enableAI && (
-          <MenuBarExtra.Item
-            title="Find Similar (AI)"
-            icon={Icon.Stars}
-            onAction={() =>
-              launchCommand({ name: "mediaDetails", type: LaunchType.UserInitiated, context: { findSimilarFor: s.id } })
-            }
-          />
-        )}
       </MenuBarExtra.Submenu>
     </>
   );

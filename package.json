@@ -48,8 +48,7 @@
   ],
   "tools": [
     { "name": "get-now-playing", "title": "Get Now Playing", "description": "Returns the currently playing tracks" },
-    { "name": "control-playback", "title": "Control Playback", "description": "Play, pause or skip the current track" },
-    { "name": "find-similar", "title": "Find Similar Music", "description": "Suggest tracks similar to the current one" }
+    { "name": "control-playback", "title": "Control Playback", "description": "Play, pause or skip the current track" }
   ],
   "preferences": [
     {
@@ -80,15 +79,6 @@
       "type": "textfield",
       "required": false,
       "default": "30"
-    },
-    {
-      "name": "enableAI",
-      "title": "AI",
-      "label": "Enable AI features (Find Similar)",
-      "description": "Toggle AI-powered actions",
-      "type": "checkbox",
-      "required": false,
-      "default": true
     }
   ],
   "dependencies": {

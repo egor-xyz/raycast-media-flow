@@ -21,7 +21,7 @@
 * `MenuBarExtra` renders a **native NSMenu**. Only `MenuBarExtra.Item` (title, subtitle, icon, tooltip, onAction, shortcut, alternate), `.Submenu`, `.Section`, and `Separator` exist. No custom row layout, no progress bars, no inline buttons, no arbitrary artwork sizes, no multi-line rows.
 * **No Slider component** exists. Progress/volume shown via `getProgressIcon(progress)` (`@raycast/utils`) — a static circular pie icon — and discrete menu items.
 * Extension **preferences are read-only** at runtime (`getPreferenceValues()`); declared in `package.json`. Form Drafts only preserve unsubmitted form input. Runtime-mutable state (pinned source, chosen fallback artwork) lives in `LocalStorage`.
-* AI tools: `tools` array in `package.json`, one file per tool at `src/tools/<name>.ts`, optional `confirmation` export. `useAI` hook comes from `@raycast/utils`.
+* AI tools: `tools` array in `package.json`, one file per tool at `src/tools/<name>.ts`, optional `confirmation` export.
 * No Touch Bar, VoiceOver-label, or high-contrast APIs are exposed to extension authors. Dropped.
 * **Per-app muting is impossible** without a virtual audio driver. Dropped.
 * `MPMediaQuery` is iOS-only. Dropped.
@@ -69,7 +69,7 @@ Menu structure (native NSMenu):
   ♫ Title — Artist            (icon: artwork; subtitle: App • 1:23/3:45 ◔)  → onAction: open app
   ▶/⏸ Play/Pause             (⌘P)
   ⏭ Next  /  ⏮ Previous      (alternate item)
-  Overflow ▸ (Submenu): Open in App, Copy "Title — Artist", Copy URL, Pin/Unpin, Find Similar (AI)
+  Overflow ▸ (Submenu): Open in App, Copy "Title — Artist", Copy URL, Pin/Unpin
 [Section: Audio]
   Output ▸ (Submenu): ✓ AirPods Pro ⌁ · MacBook Speakers · … (onAction: switch)
   Volume ▸ (Submenu): ◔ 75% · Mute · 25% · 50% · 75% · 100% · Louder ⌘↑ · Quieter ⌘↓
@@ -90,7 +90,7 @@ Menu structure (native NSMenu):
 
 The rich UI lives here (this replaces v1's impossible custom popover):
 * `List` of sources (left) with `List.Item.Detail`: large artwork (markdown image), metadata panel (title, artist, album, app, duration, position, device), progress text.
-* Actions: play/pause, next/prev, open in app, copy, pin, switch audio device (submenu action), find similar (AI).
+* Actions: play/pause, next/prev, open in app, copy, pin, switch audio device (submenu action).
 * Auto-refresh every 2s via `usePromise` + interval revalidation.
 
 ### 3. `view` command — `searchDevices` (mode: view)
@@ -111,7 +111,6 @@ navigation required.
 
 * `get-now-playing` — returns current track(s) JSON for Quick AI / AI chat.
 * `control-playback` — play/pause/next/prev with `confirmation` export.
-* `find-similar` — uses `useAI`-style prompt server-side: returns similar-track suggestions from current track metadata.
 
 ---
 
@@ -121,7 +120,6 @@ navigation required.
 * `showWhenStopped`: checkbox — keep icon when nothing plays (default true)
 * `maxTitleLength`: textfield number (default 30)
 * `refreshInterval`: command-level `interval` (default `1m`)
-* `enableAI`: checkbox (default true)
 
 (No `primarySource` preference: source priority is covered by pinning + the
 playing-first sort in `getMediaSources()`, so a manual "preferred engine" toggle was
@@ -146,7 +144,6 @@ src/
   tools/
     get-now-playing.ts
     control-playback.ts
-    find-similar.ts
   core/
     types.ts                # MediaSource, AudioDevice, PlaybackCommand, SourceProvider
     registry.ts             # provider registry (ordered, capability-aware)

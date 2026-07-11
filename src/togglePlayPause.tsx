@@ -13,6 +13,6 @@ export default async function Command(): Promise<void> {
     return;
   }
   await controlSource(target, "playpause");
-  await showHUD("⏯ Play/Pause");
+  await showHUD("Play/Pause");
   await refreshMenuBar();
 }

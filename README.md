@@ -18,8 +18,8 @@ living in the Raycast menu bar.
 - **Media details view** — a rich `List.Item.Detail` view with large artwork, full
   metadata, and every active source at once (not just whichever app the menu bar
   happened to pick).
-- **AI tools** — `Get Now Playing`, `Control Playback`, and `Find Similar Music`,
-  usable from Raycast AI / Quick AI once the extension is installed.
+- **AI tools** — `Get Now Playing` and `Control Playback`, usable from Raycast AI /
+  Quick AI once the extension is installed.
 
 ## Commands
 
@@ -85,7 +85,7 @@ Click the icon to open the menu:
   - Play/Pause
   - Next Track — hold ⌥ (Option) to reveal Previous Track in its place
   - A "More" submenu with Copy "Title — Artist", Copy URL (when the source has
-    one), Pin/Unpin, and Find Similar (AI) when AI is enabled
+    one), and Pin/Unpin
 - **Audio**
   - An Output submenu to switch the default output device
   - A Volume submenu with Mute, 25/50/75/100% presets, and Louder (⌘↑) /
@@ -116,12 +116,9 @@ position/progress; it stops the moment the menu closes.
 
 ### AI
 
-With the `enableAI` preference on (default), ask "What's playing?" in Raycast
-AI chat / Quick AI to read the current track(s) via the `Get Now Playing` tool,
-or ask it to play, pause, or skip via the `Control Playback` tool. "Find
-Similar (AI)" in the menu's More submenu asks Raycast AI for five similar
-tracks — this needs Raycast AI access (Raycast Pro or the AI add-on); without
-it, the tool reports that Raycast AI isn't available instead of suggestions.
+Ask "What's playing?" in Raycast AI chat / Quick AI to read the current
+track(s) via the `Get Now Playing` tool, or ask it to play, pause, or skip via
+the `Control Playback` tool.
 
 ### Preferences
 
@@ -133,8 +130,6 @@ Set these under **Raycast → Extensions → MediaFlow → Preferences**:
   nothing is playing (default: on)
 - **Max Title Length** (`maxTitleLength`) — truncate the menu bar title after
   this many characters (default: 30)
-- **AI** (`enableAI`) — enable AI-powered actions like Find Similar (default:
-  on)
 
 ## Supported apps
 

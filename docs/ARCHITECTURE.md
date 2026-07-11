@@ -1,7 +1,7 @@
 # Architecture
 
 MediaFlow reads "now playing" state from macOS and exposes it through three Raycast
-commands and three AI tools. This document describes how sources are discovered,
+commands and two AI tools. This document describes how sources are discovered,
 merged, and controlled, and the platform limits that shaped the design.
 
 ## Provider registry
@@ -96,13 +96,9 @@ the time a command renders it; nothing renders a remote URL as artwork directly.
 
 ## AI features
 
-The `enableAI` preference gates every AI entry point a person can click:
-`mediaDetails`'s "Find Similar (AI)" action and its `launchContext`-driven
-auto-push, plus `nowPlaying`'s "Find Similar (AI)" menu item. The three
-`src/tools/*.ts` AI tools (`get-now-playing`, `control-playback`, `find-similar`)
-are intentionally exempt from the preference — they are invoked by the user
-through Raycast AI or by the AI itself, not by clicking a MediaFlow UI element,
-so the toggle that hides MediaFlow's own buttons has no bearing on them.
+The `src/tools/*.ts` AI tools (`get-now-playing`, `control-playback`) are invoked
+by the user through Raycast AI chat or Quick AI, or by the AI itself — there is
+no MediaFlow UI element that triggers them.
 
 ## Platform constraints (why the UI looks the way it does)
 

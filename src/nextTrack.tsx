@@ -13,6 +13,6 @@ export default async function Command(): Promise<void> {
     return;
   }
   await controlSource(target, "next");
-  await showHUD("⏭ Next track");
+  await showHUD("Next track");
   await refreshMenuBar();
 }
