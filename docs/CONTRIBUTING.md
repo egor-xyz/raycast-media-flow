@@ -4,25 +4,25 @@ Thanks for considering a contribution to MediaFlow.
 
 ## Package manager
 
-This repo uses **pnpm only**. Do not commit `package-lock.json` or `yarn.lock`; the
-`pnpm-lock.yaml` in the repo root is the single source of truth. Install dependencies
-with:
+This repo uses **npm only**. Do not commit `pnpm-lock.yaml` or `yarn.lock`; the
+`package-lock.json` in the repo root is the single source of truth. Install
+dependencies with:
 
 ```bash
-pnpm install
+npm install
 ```
 
 ## Development loop
 
 ```bash
-pnpm dev          # ray develop — hot-reloading Raycast dev session
-pnpm lint          # eslint .
-pnpm typecheck     # tsc --noEmit
-pnpm test          # vitest run
+npm run dev          # ray develop — hot-reloading Raycast dev session
+npm run lint          # eslint .
+npm run typecheck     # tsc --noEmit
+npm test               # vitest run
 ```
 
-Run `pnpm test && pnpm typecheck` before pushing — CI (`.github/workflows/test.yml`)
-runs `pnpm lint`, `pnpm typecheck`, and `pnpm test` on every pull request and on push
+Run `npm test && npm run typecheck` before pushing — CI (`.github/workflows/test.yml`)
+runs `npm run lint`, `npm run typecheck`, and `npm test` on every pull request and on push
 to `main`, and will fail the same way locally as it does in CI.
 
 ## Adding a new media source

@@ -82,7 +82,7 @@ cover, at minimum:
 - `isAvailable()`: true/false based on the process-name check.
 - `control()`: asserts the exact AppleScript string sent for at least one command.
 
-Run `pnpm test` (or scope it with `pnpm test -- your-provider`) before opening a PR.
+Run `npm test` (or scope it with `npm test -- your-provider`) before opening a PR.
 
 ## Which apps get which treatment
 
