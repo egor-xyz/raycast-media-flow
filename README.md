@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.png" width="128" height="128" alt="MediaFlow icon">
+</p>
+
 # MediaFlow
 
 [![Test](https://github.com/egor-xyz/raycast-media-flow/actions/workflows/test.yml/badge.svg)](https://github.com/egor-xyz/raycast-media-flow/actions/workflows/test.yml)
