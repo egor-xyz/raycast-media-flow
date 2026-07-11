@@ -7,31 +7,44 @@ export interface MediaSnapshot {
   engineAvailable: boolean;
 }
 
+/** Strips keys whose value is explicitly undefined so they cannot clobber merge targets. */
+function defined<T extends object>(o: T): Partial<T> {
+  return Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined)) as Partial<T>;
+}
+
+const keyOf = (s: MediaSource) => s.bundleId ?? s.id;
+
 export async function getMediaSources(pinnedId?: string): Promise<MediaSnapshot> {
   const [engineAvailable, primary] = await Promise.all([
-    mediaControlProvider.isAvailable(),
-    mediaControlProvider.getSource(),
+    mediaControlProvider.isAvailable().catch(() => false),
+    mediaControlProvider.getSource().catch(() => null),
   ]);
 
   const providerSources = (
     await Promise.all(
-      getProviders().map(async (p) => ((await p.isAvailable()) ? p.getSource() : null)),
+      getProviders().map((p) =>
+        p
+          .isAvailable()
+          .then((ok) => (ok ? p.getSource() : null))
+          .catch(() => null),
+      ),
     )
   ).filter((s): s is MediaSource => s !== null);
 
   const merged = new Map<string, MediaSource>();
-  if (primary) merged.set(primary.id, primary);
+  if (primary) merged.set(keyOf(primary), primary);
   for (const s of providerSources) {
-    const existing = s.bundleId ? merged.get(s.bundleId) : undefined;
+    const key = keyOf(s);
+    const existing = merged.get(key);
     if (existing) {
-      merged.set(existing.id, {
+      merged.set(key, {
         ...existing,
-        ...s,
+        ...defined(s),
         artworkPath: existing.artworkPath ?? s.artworkPath,
         isPlaying: existing.isPlaying || s.isPlaying,
       });
-    } else if (!merged.has(s.id)) {
-      merged.set(s.id, s);
+    } else {
+      merged.set(key, s);
     }
   }
 

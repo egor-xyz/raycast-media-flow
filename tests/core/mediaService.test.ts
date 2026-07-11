@@ -75,6 +75,36 @@ describe("getMediaSources", () => {
     expect(sources[0].id).toBe("b.app");
   });
 
+  it("keeps primary field when provider merges an explicitly undefined value", async () => {
+    mc.isAvailable.mockResolvedValue(true);
+    mc.getSource.mockResolvedValue(
+      src({ id: "com.spotify.client", bundleId: "com.spotify.client", artist: "Real Artist", origin: "media-remote" }),
+    );
+    registerProvider(
+      provider(
+        "spotify",
+        ["com.spotify.client"],
+        src({ id: "com.spotify.client", bundleId: "com.spotify.client", title: "Fresh", artist: undefined }),
+      ),
+    );
+    const { sources } = await getMediaSources();
+    expect(sources).toHaveLength(1);
+    expect(sources[0]).toMatchObject({ title: "Fresh", artist: "Real Artist" });
+  });
+
+  it("survives a provider whose getSource rejects", async () => {
+    mc.isAvailable.mockResolvedValue(false);
+    mc.getSource.mockResolvedValue(null);
+    const broken = provider("broken", ["broken.app"], null);
+    broken.getSource = async () => {
+      throw new Error("boom");
+    };
+    registerProvider(broken);
+    registerProvider(provider("music", ["com.apple.Music"], src({ id: "com.apple.Music", bundleId: "com.apple.Music" })));
+    const { sources } = await getMediaSources();
+    expect(sources.map((s) => s.id)).toEqual(["com.apple.Music"]);
+  });
+
   it("degrades to providers when engine missing", async () => {
     mc.isAvailable.mockResolvedValue(false);
     mc.getSource.mockResolvedValue(null);
