@@ -105,8 +105,11 @@ The rich UI lives here (this replaces v1's impossible custom popover):
 * `showWhenStopped`: checkbox — keep icon when nothing plays (default true)
 * `maxTitleLength`: textfield number (default 30)
 * `refreshInterval`: command-level `interval` (default `1m`)
-* `primarySource`: dropdown — auto / music / spotify (default auto)
 * `enableAI`: checkbox (default true)
+
+(No `primarySource` preference: source priority is covered by pinning + the
+playing-first sort in `getMediaSources()`, so a manual "preferred engine" toggle was
+intentionally dropped.)
 
 Runtime-mutable state in `LocalStorage`: pinned source id, last known artwork cache index.
 
