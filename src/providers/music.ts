@@ -1,4 +1,8 @@
-import type { MediaSource, PlaybackCommand, SourceProvider } from "../core/types";
+import type {
+  MediaSource,
+  PlaybackCommand,
+  SourceProvider,
+} from "../core/types";
 import { runAppleScript } from "../lib/applescript";
 
 const NOW_PLAYING_SCRIPT = `tell application "Music"
@@ -28,7 +32,14 @@ export function parseMusicRecord(out: string): MusicRecord | null {
   const artist = parts.pop()!;
   const title = parts.join("|");
   if (!title || Number.isNaN(duration) || Number.isNaN(position)) return null;
-  return { title, artist, album, duration, position, isPlaying: state === "playing" };
+  return {
+    title,
+    artist,
+    album,
+    duration,
+    position,
+    isPlaying: state === "playing",
+  };
 }
 
 const CONTROL_MAP: Record<PlaybackCommand, string> = {
@@ -46,7 +57,9 @@ export const musicProvider: SourceProvider = {
   capabilities: { control: true, artwork: false, seek: false },
 
   async isAvailable() {
-    const out = await runAppleScript('tell application "System Events" to (name of processes) contains "Music"');
+    const out = await runAppleScript(
+      'tell application "System Events" to (name of processes) contains "Music"',
+    );
     return out === "true";
   },
 

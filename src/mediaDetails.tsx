@@ -24,7 +24,9 @@ export default function Command() {
           icon={Icon.Music}
           title="Nothing playing"
           description={
-            data.engineAvailable ? "Start playback in any app." : "Install media-control for full app coverage: brew install media-control"
+            data.engineAvailable
+              ? "Start playback in any app."
+              : "Install media-control for full app coverage: brew install media-control"
           }
         />
       )}
@@ -36,7 +38,11 @@ export default function Command() {
           subtitle={s.artist}
           accessories={[
             { tag: s.appName },
-            { text: s.duration ? `${formatTime(s.position)} / ${formatTime(s.duration)}` : undefined },
+            {
+              text: s.duration
+                ? `${formatTime(s.position)} / ${formatTime(s.duration)}`
+                : undefined,
+            },
             { icon: s.isPlaying ? Icon.Play : Icon.Pause },
           ]}
           detail={<ItemDetail source={s} />}
@@ -72,7 +78,10 @@ export default function Command() {
                 }}
               />
               {s.url && <Action.OpenInBrowser url={s.url} />}
-              <Action.CopyToClipboard title="Copy Title — Artist" content={`${s.title} — ${s.artist ?? ""}`} />
+              <Action.CopyToClipboard
+                title="Copy Title — Artist"
+                content={`${s.title} — ${s.artist ?? ""}`}
+              />
             </ActionPanel>
           }
         />
@@ -83,20 +92,36 @@ export default function Command() {
 
 function ItemDetail(props: { source: MediaSource }) {
   const { source: s } = props;
-  const art = s.artworkPath ? `![artwork](file://${s.artworkPath}?raycast-height=280)\n\n` : "";
+  const art = s.artworkPath
+    ? `![artwork](file://${s.artworkPath}?raycast-height=280)\n\n`
+    : "";
   return (
     <List.Item.Detail
       markdown={`${art}# ${s.title}\n\n**${s.artist ?? "Unknown artist"}**${s.album ? ` — _${s.album}_` : ""}`}
       metadata={
         <List.Item.Detail.Metadata>
           <List.Item.Detail.Metadata.Label title="App" text={s.appName} />
-          <List.Item.Detail.Metadata.Label title="Status" text={s.isPlaying ? "Playing" : "Paused"} />
+          <List.Item.Detail.Metadata.Label
+            title="Status"
+            text={s.isPlaying ? "Playing" : "Paused"}
+          />
           {s.duration !== undefined && (
-            <List.Item.Detail.Metadata.Label title="Position" text={`${formatTime(s.position)} / ${formatTime(s.duration)}`} />
+            <List.Item.Detail.Metadata.Label
+              title="Position"
+              text={`${formatTime(s.position)} / ${formatTime(s.duration)}`}
+            />
           )}
-          {s.album && <List.Item.Detail.Metadata.Label title="Album" text={s.album} />}
+          {s.album && (
+            <List.Item.Detail.Metadata.Label title="Album" text={s.album} />
+          )}
           <List.Item.Detail.Metadata.Label title="Source" text={s.origin} />
-          {s.url && <List.Item.Detail.Metadata.Link title="URL" target={s.url} text="Open" />}
+          {s.url && (
+            <List.Item.Detail.Metadata.Link
+              title="URL"
+              target={s.url}
+              text="Open"
+            />
+          )}
         </List.Item.Detail.Metadata>
       }
     />

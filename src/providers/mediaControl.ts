@@ -1,6 +1,10 @@
 import { existsSync } from "node:fs";
 import { cacheArtwork } from "../core/artworkCache";
-import type { MediaSource, PlaybackCommand, SourceProvider } from "../core/types";
+import type {
+  MediaSource,
+  PlaybackCommand,
+  SourceProvider,
+} from "../core/types";
 import { execSafe } from "../lib/exec";
 
 export interface RawNowPlaying {
@@ -18,7 +22,10 @@ export interface RawNowPlaying {
 /** Store-installed Raycast runs with a minimal PATH that omits Homebrew's bin dirs, so
  * resolve an absolute path once at module load instead of relying on shell PATH lookup. */
 function resolveMediaControlBin(): string {
-  const candidates = ["/opt/homebrew/bin/media-control", "/usr/local/bin/media-control"];
+  const candidates = [
+    "/opt/homebrew/bin/media-control",
+    "/usr/local/bin/media-control",
+  ];
   for (const candidate of candidates) {
     if (existsSync(candidate)) return candidate;
   }
@@ -37,11 +44,15 @@ export function parseMediaControlOutput(json: string): RawNowPlaying | null {
       artist: typeof o.artist === "string" ? o.artist : undefined,
       album: typeof o.album === "string" ? o.album : undefined,
       duration: typeof o.duration === "number" ? o.duration : undefined,
-      elapsedTime: typeof o.elapsedTime === "number" ? o.elapsedTime : undefined,
+      elapsedTime:
+        typeof o.elapsedTime === "number" ? o.elapsedTime : undefined,
       playing: typeof o.playing === "boolean" ? o.playing : undefined,
-      bundleIdentifier: typeof o.bundleIdentifier === "string" ? o.bundleIdentifier : undefined,
-      artworkData: typeof o.artworkData === "string" ? o.artworkData : undefined,
-      artworkMimeType: typeof o.artworkMimeType === "string" ? o.artworkMimeType : undefined,
+      bundleIdentifier:
+        typeof o.bundleIdentifier === "string" ? o.bundleIdentifier : undefined,
+      artworkData:
+        typeof o.artworkData === "string" ? o.artworkData : undefined,
+      artworkMimeType:
+        typeof o.artworkMimeType === "string" ? o.artworkMimeType : undefined,
     };
   } catch {
     return null;
@@ -72,7 +83,10 @@ export const mediaControlProvider: SourceProvider = {
     const raw = parseMediaControlOutput(out);
     if (!raw) return null;
     const key = `${raw.bundleIdentifier ?? "unknown"}:${raw.title}:${raw.artist ?? ""}`;
-    const artworkPath = raw.artworkData ? ((await cacheArtwork(key, raw.artworkData, raw.artworkMimeType)) ?? undefined) : undefined;
+    const artworkPath = raw.artworkData
+      ? ((await cacheArtwork(key, raw.artworkData, raw.artworkMimeType)) ??
+        undefined)
+      : undefined;
     return {
       id: raw.bundleIdentifier ?? "media-control",
       appName: appNameFromBundle(raw.bundleIdentifier),
