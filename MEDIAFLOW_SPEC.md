@@ -16,12 +16,12 @@
 ## Verified platform constraints (do not re-litigate)
 
 * `@raycast/api` is **1.x** (target `^1.104.0`). "Raycast 2.0" is an app rewrite, not an API bump.
-* `menu-bar` commands: background refresh `interval` minimum is **10s** (docs elsewhere say 1m; use `"1m"` default, allow `"10s"` for testing). 1–2s background refresh is impossible.
+* `menu-bar` commands: background refresh `interval` minimum is **10s** (docs elsewhere say 1m; `ray build` accepts `"10s"`, and `nowPlaying` ships with it to cut background staleness). 1–2s background refresh is impossible.
 * While the menu is **open**, the command process stays alive — a `setInterval` + `setState` loop can live-update items (progress, position). It stops when the menu closes.
 * `MenuBarExtra` renders a **native NSMenu**. Only `MenuBarExtra.Item` (title, subtitle, icon, tooltip, onAction, shortcut, alternate), `.Submenu`, `.Section`, and `Separator` exist. No custom row layout, no progress bars, no inline buttons, no arbitrary artwork sizes, no multi-line rows.
 * **No Slider component** exists. Progress/volume shown via `getProgressIcon(progress)` (`@raycast/utils`) — a static circular pie icon — and discrete menu items.
 * Extension **preferences are read-only** at runtime (`getPreferenceValues()`); declared in `package.json`. Form Drafts only preserve unsubmitted form input. Runtime-mutable state (pinned source, chosen fallback artwork) lives in `LocalStorage`.
-* AI tools: `tools` array in `package.json`, one file per tool at `src/tools/<name>.ts`, optional `confirmation` export. `useAI` hook comes from `@raycast/utils`.
+* AI tools: `tools` array in `package.json`, one file per tool at `src/tools/<name>.ts`, optional `confirmation` export.
 * No Touch Bar, VoiceOver-label, or high-contrast APIs are exposed to extension authors. Dropped.
 * **Per-app muting is impossible** without a virtual audio driver. Dropped.
 * `MPMediaQuery` is iOS-only. Dropped.
@@ -55,7 +55,7 @@
 
 ## Commands
 
-### 1. `menu-bar` command — `nowPlaying` (mode: menu-bar, interval: 1m)
+### 1. `menu-bar` command — `nowPlaying` (mode: menu-bar, interval: 10s)
 
 Menu bar icon + title:
 * Icon: artwork thumbnail when playing (Image.ImageLike from cached artwork file), else waveform icon.
@@ -69,33 +69,48 @@ Menu structure (native NSMenu):
   ♫ Title — Artist            (icon: artwork; subtitle: App • 1:23/3:45 ◔)  → onAction: open app
   ▶/⏸ Play/Pause             (⌘P)
   ⏭ Next  /  ⏮ Previous      (alternate item)
-  Overflow ▸ (Submenu): Open in App, Copy "Title — Artist", Copy URL, Pin/Unpin, Find Similar (AI)
+  Overflow ▸ (Submenu): Open in App, Copy "Title — Artist", Copy URL, Pin/Unpin
 [Section: Audio]
   Output ▸ (Submenu): ✓ AirPods Pro ⌁ · MacBook Speakers · … (onAction: switch)
   Volume ▸ (Submenu): ◔ 75% · Mute · 25% · 50% · 75% · 100% · Louder ⌘↑ · Quieter ⌘↓
 [Section]
-  Details… (opens view command) · Refresh · Preferences… · Last update 12:03:44
+  Details… (opens view command) · Hide/Show Title in Menu Bar · Open Extension Preferences · Refresh · Last update 12:03:44
 ```
 * Progress rendered as `getProgressIcon(position/duration)` in the source item's icon slot or a dedicated item; text `1:23 / 3:45` in subtitle.
-* While menu open: 2s `setInterval` re-poll updates position/state live.
+* While menu open: 10s `setInterval` re-poll updates position/state live (kept long enough to
+  shrink the native-menu-rebuild window that could otherwise land a click on a shifted row).
+  The interval is skipped entirely for background-refresh launches (`LaunchType.Background`) so
+  it can't keep the process alive across the 10s command `interval`. Row order across re-polls
+  is stabilized via `stabilizeOrder()` (`src/core/mediaService.ts`), which preserves the
+  previous poll's relative ordering for known source ids and appends new ones — so a
+  `isPlaying` flip can't reshuffle Play/Pause vs. Next/Previous mid-open.
 * If nothing playing: placeholder item + quick-launch items for Music/Spotify.
 
 ### 2. `view` command — `mediaDetails` (mode: view)
 
 The rich UI lives here (this replaces v1's impossible custom popover):
 * `List` of sources (left) with `List.Item.Detail`: large artwork (markdown image), metadata panel (title, artist, album, app, duration, position, device), progress text.
-* Actions: play/pause, next/prev, open in app, copy, pin, switch audio device (submenu action), find similar (AI).
+* Actions: play/pause, next/prev, open in app, copy, pin, switch audio device (submenu action).
 * Auto-refresh every 2s via `usePromise` + interval revalidation.
 
 ### 3. `view` command — `searchDevices` (mode: view)
 
 * List input+output devices, active check-mark, wireless badge, transport type tag, per-device volume where supported, switch on enter.
 
-### 4. AI tools (`tools` in package.json)
+### 4. `no-view` commands — dedicated playback shortcuts
+
+* `nextTrack` — "Next Track": skip the top (playing-first) media source.
+* `previousTrack` — "Previous Track": go back on the top media source.
+* `togglePlayPause` — "Play/Pause": toggle play/pause on the top media source.
+
+Each targets `getMediaSources().sources[0]`, shows a HUD confirming the action (or "No active
+media source" when nothing is playing), and is meant to be bound to a global hotkey — no menu
+navigation required.
+
+### 5. AI tools (`tools` in package.json)
 
 * `get-now-playing` — returns current track(s) JSON for Quick AI / AI chat.
 * `control-playback` — play/pause/next/prev with `confirmation` export.
-* `find-similar` — uses `useAI`-style prompt server-side: returns similar-track suggestions from current track metadata.
 
 ---
 
@@ -105,10 +120,14 @@ The rich UI lives here (this replaces v1's impossible custom popover):
 * `showWhenStopped`: checkbox — keep icon when nothing plays (default true)
 * `maxTitleLength`: textfield number (default 30)
 * `refreshInterval`: command-level `interval` (default `1m`)
-* `primarySource`: dropdown — auto / music / spotify (default auto)
-* `enableAI`: checkbox (default true)
 
-Runtime-mutable state in `LocalStorage`: pinned source id, last known artwork cache index.
+(No `primarySource` preference: source priority is covered by pinning + the
+playing-first sort in `getMediaSources()`, so a manual "preferred engine" toggle was
+intentionally dropped.)
+
+Runtime-mutable state in `LocalStorage`: pinned source id, last known artwork cache index,
+menu bar title hidden override (session-level toggle layered on top of the read-only
+`menuBarStyle` preference; clearing it falls back to the preference).
 
 ---
 
@@ -119,10 +138,12 @@ src/
   nowPlaying.tsx            # menu-bar command
   mediaDetails.tsx          # view command (rich UI)
   searchDevices.tsx         # view command (audio devices)
+  nextTrack.tsx             # no-view command (skip forward on top source)
+  previousTrack.tsx         # no-view command (skip back on top source)
+  togglePlayPause.tsx       # no-view command (toggle play/pause on top source)
   tools/
     get-now-playing.ts
     control-playback.ts
-    find-similar.ts
   core/
     types.ts                # MediaSource, AudioDevice, PlaybackCommand, SourceProvider
     registry.ts             # provider registry (ordered, capability-aware)
