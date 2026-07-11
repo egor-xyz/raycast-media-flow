@@ -63,7 +63,7 @@ export const spotifyProvider: SourceProvider = {
   id: "spotify",
   displayName: "Spotify",
   bundleIds: ["com.spotify.client"],
-  capabilities: { control: true, artwork: true, seek: false },
+  capabilities: { control: true, artwork: false, seek: false },
 
   async isAvailable() {
     const out = await runAppleScript('tell application "System Events" to (name of processes) contains "Spotify"');

@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Detail, Icon, LaunchProps, List, useNavigation } from "@raycast/api";
+import { Action, ActionPanel, Detail, getPreferenceValues, Icon, LaunchProps, List, useNavigation } from "@raycast/api";
 import { useAI, usePromise } from "@raycast/utils";
 import { useEffect, useState } from "react";
 import { controlSource, getMediaSources } from "./core/mediaService";
@@ -8,7 +8,12 @@ import { formatTime } from "./lib/format";
 
 registerAllProviders();
 
+interface Prefs {
+  enableAI: boolean;
+}
+
 export default function Command(props: LaunchProps<{ launchContext?: { findSimilarFor?: string } }>) {
+  const { enableAI } = getPreferenceValues<Prefs>();
   const { data, isLoading, revalidate } = usePromise(() => getMediaSources());
 
   useEffect(() => {
@@ -21,15 +26,18 @@ export default function Command(props: LaunchProps<{ launchContext?: { findSimil
   const [autoPushed, setAutoPushed] = useState(false);
 
   // Deep-link from nowPlaying's "Find Similar (AI)" menu item: once the sources have
-  // loaded, push the AI panel for the requested source exactly once.
+  // loaded, push the AI panel for the requested source exactly once. Gated on the
+  // enableAI preference — nowPlaying only offers this deep link when AI is enabled,
+  // but a stale launch context (or a manual launchCommand call) could still arrive
+  // after the user turns AI off, so re-check here.
   useEffect(() => {
-    if (autoPushed || !findSimilarFor || !data) return;
+    if (autoPushed || !findSimilarFor || !data || !enableAI) return;
     const source = data.sources.find((s) => s.id === findSimilarFor);
     if (source) {
       setAutoPushed(true);
       push(<Similar source={source} />);
     }
-  }, [autoPushed, findSimilarFor, data, push]);
+  }, [autoPushed, findSimilarFor, data, enableAI, push]);
 
   return (
     <List isLoading={isLoading} isShowingDetail>
@@ -82,12 +90,14 @@ export default function Command(props: LaunchProps<{ launchContext?: { findSimil
                   revalidate();
                 }}
               />
-              <Action
-                title="Find Similar (AI)"
-                icon={Icon.Stars}
-                shortcut={{ modifiers: ["cmd"], key: "f" }}
-                onAction={() => push(<Similar source={s} />)}
-              />
+              {enableAI && (
+                <Action
+                  title="Find Similar (AI)"
+                  icon={Icon.Stars}
+                  shortcut={{ modifiers: ["cmd"], key: "f" }}
+                  onAction={() => push(<Similar source={s} />)}
+                />
+              )}
               {s.url && <Action.OpenInBrowser url={s.url} />}
               <Action.CopyToClipboard title="Copy Title — Artist" content={`${s.title} — ${s.artist ?? ""}`} />
             </ActionPanel>

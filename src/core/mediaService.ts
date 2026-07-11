@@ -15,10 +15,10 @@ function defined<T extends object>(o: T): Partial<T> {
 const keyOf = (s: MediaSource) => s.bundleId ?? s.id;
 
 export async function getMediaSources(pinnedId?: string): Promise<MediaSnapshot> {
-  const [engineAvailable, primary] = await Promise.all([
-    mediaControlProvider.isAvailable().catch(() => false),
-    mediaControlProvider.getSource().catch(() => null),
-  ]);
+  const engineAvailablePromise = mediaControlProvider.isAvailable().catch(() => false);
+  const primaryPromise = engineAvailablePromise.then((ok) => (ok ? mediaControlProvider.getSource().catch(() => null) : null));
+
+  const [engineAvailable, primary] = await Promise.all([engineAvailablePromise, primaryPromise]);
 
   const providerSources = (
     await Promise.all(

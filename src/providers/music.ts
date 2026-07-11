@@ -43,7 +43,7 @@ export const musicProvider: SourceProvider = {
   id: "music",
   displayName: "Music",
   bundleIds: ["com.apple.Music"],
-  capabilities: { control: true, artwork: false, seek: true },
+  capabilities: { control: true, artwork: false, seek: false },
 
   async isAvailable() {
     const out = await runAppleScript('tell application "System Events" to (name of processes) contains "Music"');

@@ -87,11 +87,15 @@ function Menu(props: {
     <>
       <MenuBarExtra.Section title="Now Playing">
         {snapshot.sources.length === 0 && (
-          <MenuBarExtra.Item
-            title="Nothing playing"
-            icon={Icon.SpeakerOff}
-            subtitle={snapshot.engineAvailable ? undefined : "brew install media-control for full coverage"}
-          />
+          <>
+            <MenuBarExtra.Item
+              title="Nothing playing"
+              icon={Icon.SpeakerOff}
+              subtitle={snapshot.engineAvailable ? undefined : "brew install media-control for full coverage"}
+            />
+            <MenuBarExtra.Item title="Open Music" icon={Icon.Music} onAction={() => void execSafe("open", ["-b", "com.apple.Music"])} />
+            <MenuBarExtra.Item title="Open Spotify" icon={Icon.Music} onAction={() => void execSafe("open", ["-b", "com.spotify.client"])} />
+          </>
         )}
         {snapshot.sources.map((s) => (
           <SourceItems key={s.id} source={s} pinned={pinnedId === s.id} maxLen={maxLen} enableAI={enableAI} onAction={onAction} />
@@ -113,10 +117,29 @@ function Menu(props: {
           ))}
         </MenuBarExtra.Submenu>
         <MenuBarExtra.Submenu title={`Volume: ${volume ?? "–"}%`} icon={volume !== null ? getProgressIcon(volume / 100) : Icon.SpeakerOff}>
+          {/* cmd+arrowUp/Down aren't in @raycast/eslint-plugin's reserved-shortcut list, so they're safe here. */}
+          <MenuBarExtra.Item
+            title="Louder"
+            icon={Icon.SpeakerUp}
+            shortcut={{ modifiers: ["cmd"], key: "arrowUp" }}
+            onAction={async () => {
+              await setSystemVolume((volume ?? 0) + 10);
+              onAction();
+            }}
+          />
+          <MenuBarExtra.Item
+            title="Quieter"
+            icon={Icon.SpeakerDown}
+            shortcut={{ modifiers: ["cmd"], key: "arrowDown" }}
+            onAction={async () => {
+              await setSystemVolume((volume ?? 0) - 10);
+              onAction();
+            }}
+          />
           {VOLUME_STEPS.map((v) => (
             <MenuBarExtra.Item
               key={v}
-              title={`${v}%`}
+              title={v === 0 ? "Mute" : `${v}%`}
               icon={volume !== null && Math.abs(volume - v) < 13 ? Icon.CheckCircle : undefined}
               onAction={async () => {
                 await setSystemVolume(v);
