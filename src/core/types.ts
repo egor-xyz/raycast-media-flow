@@ -1,4 +1,5 @@
-export type PlaybackCommand = "play" | "pause" | "playpause" | "next" | "previous";
+export type PlaybackCommand =
+  "play" | "pause" | "playpause" | "next" | "previous";
 
 export type SourceOrigin = "media-remote" | "applescript" | "browser";
 

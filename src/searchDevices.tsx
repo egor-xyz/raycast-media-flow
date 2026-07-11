@@ -1,4 +1,12 @@
-import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Color,
+  Icon,
+  List,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import { getDevices, setDefaultOutput } from "./audio/devices";
 import { getSystemVolume, setSystemVolume } from "./audio/volume";
@@ -29,16 +37,32 @@ export default function Command() {
   );
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder={`Search devices — system volume ${data?.volume ?? "–"}%`}>
+    <List
+      isLoading={isLoading}
+      searchBarPlaceholder={`Search devices — system volume ${data?.volume ?? "–"}%`}
+    >
       <List.Section title="Output">
         {outputs.map((d) => (
           <List.Item
             key={`${d.kind}-${d.id}`}
-            icon={d.isDefault ? { source: Icon.CheckCircle, tintColor: Color.Green } : d.isWireless ? Icon.Bluetooth : Icon.Plug}
+            icon={
+              d.isDefault
+                ? { source: Icon.CheckCircle, tintColor: Color.Green }
+                : d.isWireless
+                  ? Icon.Bluetooth
+                  : Icon.Plug
+            }
             title={d.name}
             accessories={[
-              { tag: { value: d.transportType, color: d.isWireless ? Color.Blue : Color.SecondaryText } },
-              ...(d.volume !== undefined ? [{ text: `${Math.round(d.volume * 100)}%` }] : []),
+              {
+                tag: {
+                  value: d.transportType,
+                  color: d.isWireless ? Color.Blue : Color.SecondaryText,
+                },
+              },
+              ...(d.volume !== undefined
+                ? [{ text: `${Math.round(d.volume * 100)}%` }]
+                : []),
             ]}
             actions={
               <ActionPanel>
