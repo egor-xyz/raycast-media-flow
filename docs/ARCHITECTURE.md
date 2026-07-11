@@ -69,6 +69,22 @@ installed and running (Music, Spotify, Safari/Chrome tab titles) — nothing thr
 command crashes. The menu-bar command surfaces an install hint pointing at
 `brew install media-control` when running in this state.
 
+## Audio devices
+
+`src/audio/devices.ts` lists and switches macOS audio devices by spawning the
+`audio-devices` CLI binary from the `macos-audio-devices` npm package directly via
+`execSafe`, rather than importing that package's JS wrapper
+(`import("macos-audio-devices")`). The wrapper resolves its binary's path relative to
+its own module directory inside `node_modules`; `ray build` bundles the extension into
+a single file with a different runtime layout, so that relative path resolves to
+nothing once built, every call rejects, and the Audio Devices view silently shows "No
+Results". The fix vendors the binary at `assets/audio-devices` (copied verbatim,
+unmodified, MIT licensed) and resolves it at runtime via `environment.assetsPath`,
+falling back to the `node_modules` copy for unit tests/dev scripts and finally to a
+bare `audio-devices` lookup on `PATH`. The `macos-audio-devices` npm dependency stays
+in `package.json` as the source of truth for the binary (provenance, license, updates)
+and as that dev/test fallback, even though its JS wrapper is never imported.
+
 ## Artwork cache
 
 `cacheArtwork()` (`src/core/artworkCache.ts`) persists base64 artwork to a file under
