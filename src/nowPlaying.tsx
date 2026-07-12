@@ -8,7 +8,7 @@ import {
   getPreferenceValues,
   openExtensionPreferences,
 } from "@raycast/api";
-import { getProgressIcon, usePromise } from "@raycast/utils";
+import { usePromise } from "@raycast/utils";
 import { useEffect, useRef } from "react";
 import { getDevices, setDefaultOutput } from "./audio/devices";
 import { getSystemVolume, setSystemVolume } from "./audio/volume";
@@ -262,11 +262,7 @@ function Menu(props: {
         </MenuBarExtra.Submenu>
         <MenuBarExtra.Submenu
           title={`Volume: ${volume ?? "–"}%`}
-          icon={
-            volume !== null
-              ? getProgressIcon(volume / 100, "#FFFFFF")
-              : Icon.SpeakerOff
-          }
+          icon={Icon.SpeakerHigh}
         >
           {/* cmd+arrowUp/Down aren't in @raycast/eslint-plugin's reserved-shortcut list, so they're safe here. */}
           <MenuBarExtra.Item
@@ -332,7 +328,7 @@ function SourceItems(props: { source: MediaSource; onAction: () => void }) {
     <>
       <MenuBarExtra.Item
         title={`Open ${s.appName}`}
-        icon={Icon.AppWindow}
+        icon={Icon.Music}
         onAction={() => focusSource(s)}
       />
       <MenuBarExtra.Item
