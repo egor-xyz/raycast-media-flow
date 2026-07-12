@@ -92,8 +92,10 @@ export default function Command() {
 
 function ItemDetail(props: { source: MediaSource }) {
   const { source: s } = props;
+  // encodeURI so spaces in the path (e.g. "Application Support") don't break the
+  // markdown image link and make it render as literal text.
   const art = s.artworkPath
-    ? `![artwork](file://${s.artworkPath}?raycast-height=280)\n\n`
+    ? `![artwork](file://${encodeURI(s.artworkPath)}?raycast-height=160)\n\n`
     : "";
   return (
     <List.Item.Detail
