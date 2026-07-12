@@ -164,7 +164,8 @@ function Menu(props: {
   lastPlayer: LastPlayer | undefined;
   onAction: () => void;
 }) {
-  const { snapshot, devices, volume, titleHidden, lastPlayer, onAction } = props;
+  const { snapshot, devices, volume, titleHidden, lastPlayer, onAction } =
+    props;
   const outputs = devices.filter((d) => d.kind === "output");
 
   // When something is playing, show only the playing source(s) so the dropdown matches
