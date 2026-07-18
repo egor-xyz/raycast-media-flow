@@ -106,7 +106,7 @@
     "eslint": "^9.0.0",
     "macos-audio-devices": "^1.4.0",
     "typescript": "^5.8.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.10"
   },
   "scripts": {
     "build": "ray build -e dist",
