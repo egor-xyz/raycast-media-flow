@@ -105,7 +105,7 @@
     "@types/react": "^19.0.0",
     "eslint": "^9.0.0",
     "macos-audio-devices": "^1.4.0",
-    "typescript": "^5.8.0",
+    "typescript": "^7.0.2",
     "vitest": "^3.0.0"
   },
   "scripts": {
