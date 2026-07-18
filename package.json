@@ -101,7 +101,7 @@
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.0.0",
     "eslint": "^9.0.0",
     "macos-audio-devices": "^1.4.0",
