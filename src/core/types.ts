@@ -1,5 +1,4 @@
-export type PlaybackCommand =
-  "play" | "pause" | "playpause" | "next" | "previous";
+export type PlaybackCommand = "play" | "pause" | "playpause" | "next" | "previous";
 
 export type SourceOrigin = "media-remote" | "applescript" | "browser";
 
@@ -33,6 +32,12 @@ export interface SourceProvider {
   displayName: string;
   /** bundle ids this provider can enrich/control (match against media-control output) */
   bundleIds: string[];
+  /**
+   * When true, this provider only contributes a source if the media-control engine is
+   * unavailable. Used for heuristic providers (e.g. browser tab scraping) that can report
+   * the wrong/stale tab and would otherwise duplicate media-control's accurate coverage.
+   */
+  fallbackOnly?: boolean;
   capabilities: ProviderCapabilities;
   isAvailable(): Promise<boolean>;
   getSource(): Promise<MediaSource | null>;

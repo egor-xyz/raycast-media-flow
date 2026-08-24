@@ -6,6 +6,9 @@
   "icon": "icon.png",
   "author": "egorxyz",
   "license": "MIT",
+  "categories": [
+    "Media"
+  ],
   "commands": [
     {
       "name": "nowPlaying",
@@ -43,11 +46,31 @@
       "title": "Play/Pause",
       "description": "Toggle play/pause on the active media source",
       "mode": "no-view"
+    },
+    {
+      "name": "openPlayer",
+      "title": "Open Player",
+      "description": "Focus the app window of the active media source",
+      "mode": "no-view"
+    },
+    {
+      "name": "copySongName",
+      "title": "Copy Song Name",
+      "description": "Copy the current track title and artist to the clipboard",
+      "mode": "no-view"
     }
   ],
   "tools": [
-    { "name": "get-now-playing", "title": "Get Now Playing", "description": "Returns the currently playing tracks" },
-    { "name": "control-playback", "title": "Control Playback", "description": "Play, pause or skip the current track" }
+    {
+      "name": "get-now-playing",
+      "title": "Get Now Playing",
+      "description": "Returns the currently playing tracks"
+    },
+    {
+      "name": "control-playback",
+      "title": "Control Playback",
+      "description": "Play, pause or skip the current track"
+    }
   ],
   "preferences": [
     {
@@ -58,8 +81,14 @@
       "required": false,
       "default": "iconAndTitle",
       "data": [
-        { "title": "Icon and Title", "value": "iconAndTitle" },
-        { "title": "Icon Only", "value": "iconOnly" }
+        {
+          "title": "Icon and Title",
+          "value": "iconAndTitle"
+        },
+        {
+          "title": "Icon Only",
+          "value": "iconOnly"
+        }
       ]
     },
     {
@@ -82,14 +111,14 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.104.0",
-    "@raycast/utils": "^2.2.0",
-    "macos-audio-devices": "^1.4.0"
+    "@raycast/utils": "^2.2.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "eslint": "^9.0.0",
+    "macos-audio-devices": "^1.4.0",
     "typescript": "^5.8.0",
     "vitest": "^3.0.0"
   },
@@ -98,8 +127,12 @@
     "dev": "ray develop",
     "lint": "eslint .",
     "lint:ray": "ray lint",
+    "fix-lint": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "publish": "npx @raycast/api@latest publish"
-  }
+  },
+  "platforms": [
+    "macOS"
+  ]
 }

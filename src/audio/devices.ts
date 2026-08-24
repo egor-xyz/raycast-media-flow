@@ -13,9 +13,10 @@
  * binary into assets/ and resolving it via `environment.assetsPath` at runtime
  * survives bundling.
  *
- * The `macos-audio-devices` dependency stays in package.json purely as the source of
- * truth for this binary (provenance/license/updates) and as a dev/test fallback path
- * — its JS wrapper is never imported here.
+ * `macos-audio-devices` is a devDependency only (not a runtime dependency): it is the
+ * source of truth for this binary (provenance/license/updates) and the dev/test
+ * fallback path below — its JS wrapper is never imported, so it must not ship as a
+ * runtime dependency.
  */
 import { chmodSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -23,12 +24,7 @@ import type { AudioDevice } from "../core/types";
 import { execSafe } from "../lib/exec";
 
 /** transportType values (lowercased) that count as wireless. */
-const WIRELESS_TRANSPORTS = new Set([
-  "bluetooth",
-  "bluetooth-le",
-  "bluetoothle",
-  "airplay",
-]);
+const WIRELESS_TRANSPORTS = new Set(["bluetooth", "bluetooth-le", "bluetoothle", "airplay"]);
 
 interface RawDevice {
   id: number;
@@ -51,9 +47,7 @@ function resolveBin(): string {
     const { environment } = require("@raycast/api") as {
       environment?: { assetsPath: string };
     };
-    const bundled = environment?.assetsPath
-      ? join(environment.assetsPath, "audio-devices")
-      : undefined;
+    const bundled = environment?.assetsPath ? join(environment.assetsPath, "audio-devices") : undefined;
     if (bundled && existsSync(bundled)) {
       try {
         chmodSync(bundled, 0o755);
@@ -67,14 +61,7 @@ function resolveBin(): string {
     // no Raycast runtime available (unit tests, dev scripts) — fall through
   }
 
-  const devFallback = join(
-    __dirname,
-    "..",
-    "..",
-    "node_modules",
-    "macos-audio-devices",
-    "audio-devices",
-  );
+  const devFallback = join(__dirname, "..", "..", "node_modules", "macos-audio-devices", "audio-devices");
   if (existsSync(devFallback)) {
     binPath = devFallback;
     return binPath;
@@ -88,11 +75,7 @@ function isWirelessTransport(transportType: string): boolean {
   return WIRELESS_TRANSPORTS.has(transportType.toLowerCase());
 }
 
-function toAudioDevice(
-  device: RawDevice,
-  kind: "input" | "output",
-  defaultId: number | null,
-): AudioDevice {
+function toAudioDevice(device: RawDevice, kind: "input" | "output", defaultId: number | null): AudioDevice {
   return {
     id: String(device.id),
     name: device.name,
@@ -131,10 +114,8 @@ export async function getDevices(): Promise<AudioDevice[]> {
 
     const devices: AudioDevice[] = [];
     for (const device of rawDevices) {
-      if (device.isOutput)
-        devices.push(toAudioDevice(device, "output", defaultOutputId));
-      if (device.isInput)
-        devices.push(toAudioDevice(device, "input", defaultInputId));
+      if (device.isOutput) devices.push(toAudioDevice(device, "output", defaultOutputId));
+      if (device.isInput) devices.push(toAudioDevice(device, "input", defaultInputId));
     }
     return devices;
   } catch {

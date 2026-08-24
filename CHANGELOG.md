@@ -1,6 +1,6 @@
 # MediaFlow Changelog
 
-## [Initial Release] - 2026-07-11
+## [Initial Release] - 2026-08-03
 
 - Now Playing menu bar: artwork, title/artist, live position, play/pause/skip, and
   quick volume/output-device switching without leaving the menu bar.
@@ -11,5 +11,5 @@
 - Universal source detection via the `media-control` CLI, with AppleScript enrichment
   and control for Music.app and Spotify, and graceful degradation to AppleScript-only
   coverage when `media-control` isn't installed.
-- Pin any source to the top of the menu, with playing-first sorting.
+- Playing-first sorting keeps the active source at the top of the menu.
 - AI tools: Get Now Playing and Control Playback, usable from Raycast AI / Quick AI.
